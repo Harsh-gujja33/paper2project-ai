@@ -8,17 +8,20 @@ client = genai.Client(
     api_key=os.getenv("GEMINI_API_KEY")
 )
 
-def extract_innovations(text: str):
+def generate_roadmap(text: str):
 
     prompt = f"""
-    Analyze this research paper and provide:
+    Convert this paper into a real project roadmap.
 
-    1. Main Innovation
-    2. Novel Contributions
-    3. Advantages Over Existing Approaches
-    4. Potential Impact
+    Return:
 
-    Research Paper:
+    1. Project Idea
+    2. Tech Stack
+    3. Development Steps
+    4. Milestones
+    5. Challenges
+
+    Paper:
     {text[:30000]}
     """
 

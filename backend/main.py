@@ -1,6 +1,7 @@
 import os
 from fastapi import FastAPI, File, UploadFile
 
+from agents.implementation_agent import generate_roadmap
 from agents.innovation_agent import extract_innovations
 from agents.summary_agent import summarize_paper
 from utils.pdf_parser import extract_text_from_pdf
@@ -27,15 +28,15 @@ async def upload_pdf(file: UploadFile = File(...)):
     # 1. Parse text from file
     paper_text = extract_text_from_pdf(file_path)
 
-    # 2. Extract key innovations from text
-    innovation = extract_innovations(paper_text)
-
-    # 3. Generate summary content
+    # 2. Process content through agents
     summary = summarize_paper(paper_text)
+    innovation = extract_innovations(paper_text)
+    roadmap = generate_roadmap(paper_text)
 
-    # 4. Return unified response data
+    # 3. Return unified pipeline response
     return {
         "filename": file.filename,
         "summary": summary,
         "innovation": innovation,
+        "roadmap": roadmap,
     }
