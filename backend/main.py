@@ -1,5 +1,6 @@
 import os
 from fastapi import FastAPI, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 
 from agents.implementation_agent import generate_roadmap
 from agents.innovation_agent import extract_innovations
@@ -7,6 +8,18 @@ from agents.summary_agent import summarize_paper
 from utils.pdf_parser import extract_text_from_pdf
 
 app = FastAPI()
+
+# Configure CORS Middleware for Frontend Communication
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
