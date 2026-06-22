@@ -1,6 +1,6 @@
-from google import genai
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
+from google import genai
 
 load_dotenv()
 
@@ -11,22 +11,36 @@ client = genai.Client(
 def generate_roadmap(text: str):
 
     prompt = f"""
-    Convert this paper into a real project roadmap.
+You are a senior software architect.
 
-    Return:
+Convert this research paper into a practical software project.
 
-    1. Project Idea
-    2. Tech Stack
-    3. Development Steps
-    4. Milestones
-    5. Challenges
+Provide:
 
-    Paper:
-    {text[:30000]}
-    """
+# Project Idea
+
+# Recommended Tech Stack
+
+# Architecture Overview
+
+# Development Phases
+
+Phase 1 - MVP
+Phase 2 - Core Features
+Phase 3 - Advanced Features
+
+# Challenges
+
+# Estimated Timeline
+
+# Deployment Strategy
+
+Research Paper:
+{text[:30000]}
+"""
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-2.0-flash",
         contents=prompt
     )
 

@@ -1,6 +1,6 @@
-from google import genai
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
+from google import genai
 
 load_dotenv()
 
@@ -11,23 +11,30 @@ client = genai.Client(
 def summarize_paper(text: str):
 
     prompt = f"""
-    You are a research paper expert.
+You are a research paper expert.
 
-    Analyze the paper and provide:
+Explain the paper in a beginner-friendly manner.
 
-    1. Executive Summary
-    2. Problem Statement
-    3. Proposed Solution
-    4. Key Findings
+Provide:
 
-    Keep the explanation simple and beginner-friendly.
+# Executive Summary
 
-    Research Paper:
-    {text[:30000]}
-    """
+# Problem Statement
+
+# Proposed Solution
+
+# Key Findings
+
+# Real World Applications
+
+# Why This Research Matters
+
+Research Paper:
+{text[:30000]}
+"""
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-2.0-flash",
         contents=prompt
     )
 

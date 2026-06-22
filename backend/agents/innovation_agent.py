@@ -1,6 +1,6 @@
-from google import genai
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
+from google import genai
 
 load_dotenv()
 
@@ -11,19 +11,31 @@ client = genai.Client(
 def extract_innovations(text: str):
 
     prompt = f"""
-    Analyze this research paper and provide:
+You are a startup strategist and innovation consultant.
 
-    1. Main Innovation
-    2. Novel Contributions
-    3. Advantages Over Existing Approaches
-    4. Potential Impact
+Analyze the research paper and provide:
 
-    Research Paper:
-    {text[:30000]}
-    """
+# Main Innovation
+Explain the core innovation in simple language.
+
+# Product Opportunities
+List 3 products that can be built using this research.
+
+# Startup Ideas
+List 3 startup ideas with short descriptions.
+
+# Market Potential
+Explain who would use these products and why.
+
+# Competitive Advantage
+Explain what makes these ideas unique.
+
+Research Paper:
+{text[:30000]}
+"""
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
+        model="gemini-2.0-flash",
         contents=prompt
     )
 
