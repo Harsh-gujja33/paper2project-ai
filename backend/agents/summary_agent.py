@@ -1,4 +1,5 @@
 import os
+import time
 from dotenv import load_dotenv
 from google import genai
 
@@ -30,12 +31,21 @@ Provide:
 # Why This Research Matters
 
 Research Paper:
-{text[:30000]}
+{text[:8000]}
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt
-    )
+    for attempt in range(3):
+        try:
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt
+            )
+            return response.text
 
-    return response.text
+        except Exception as e:
+            print(f"Summary Attempt {attempt + 1} Failed:", e)
+            
+            if attempt < 2:
+                time.sleep(10)
+
+    return "Summary generation failed."

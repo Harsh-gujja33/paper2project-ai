@@ -2,14 +2,11 @@ import os
 from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
-from agents.implementation_agent import generate_roadmap
-from agents.innovation_agent import extract_innovations
-from agents.summary_agent import summarize_paper
+from agents.analysis_agent import generate_complete_analysis
 from utils.pdf_parser import extract_text_from_pdf
 
 app = FastAPI()
 
-# Permissive CORS Configuration for Testing/Debugging
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -30,35 +27,34 @@ def home():
 @app.post("/upload")
 async def upload_pdf(file: UploadFile = File(...)):
 
-    print("STEP 1: File received")
+    print("\n========== NEW REQUEST ==========")
 
     file_path = os.path.join(UPLOAD_DIR, file.filename)
 
     with open(file_path, "wb") as buffer:
         buffer.write(await file.read())
 
-    print("STEP 2: File saved")
+    print("STEP 1: File Saved")
 
     paper_text = extract_text_from_pdf(file_path)
 
-    print("STEP 3: PDF parsed")
+    print("STEP 2: PDF Parsed")
     print("TEXT LENGTH:", len(paper_text))
 
-    summary = "Test Summary"
+    try:
+        print("Generating Complete Analysis...")
 
-    print("STEP 4: Summary generated")
+        analysis = generate_complete_analysis(
+            paper_text[:8000]
+        )
 
-    innovation =  "Test Innovation"
+        print("Analysis Generated Successfully")
 
-    print("STEP 5: Innovation generated")
-
-    roadmap = "Test Roadmap"
-
-    print("STEP 6: Roadmap generated")
+    except Exception as e:
+        analysis = f"Error: {str(e)}"
+        print("ANALYSIS FAILED:", e)
 
     return {
         "filename": file.filename,
-        "summary": summary,
-        "innovation": innovation,
-        "roadmap": roadmap,
+        "analysis": analysis
     }

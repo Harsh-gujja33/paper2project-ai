@@ -1,4 +1,5 @@
 import os
+import time
 from dotenv import load_dotenv
 from google import genai
 
@@ -31,12 +32,21 @@ Explain who would use these products and why.
 Explain what makes these ideas unique.
 
 Research Paper:
-{text[:30000]}
+{text[:8000]}
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt
-    )
+    for attempt in range(3):
+        try:
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt
+            )
+            return response.text
 
-    return response.text
+        except Exception as e:
+            print(f"Innovation Attempt {attempt + 1} Failed:", e)
+
+            if attempt < 2:
+                time.sleep(10)
+
+    return "Innovation generation failed."

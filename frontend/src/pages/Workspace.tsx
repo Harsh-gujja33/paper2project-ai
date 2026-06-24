@@ -3,12 +3,8 @@ import api from "../services/api";
 
 function Workspace() {
   const [file, setFile] = useState<File | null>(null);
-
   const [loading, setLoading] = useState(false);
-
   const [summary, setSummary] = useState("");
-  const [innovation, setInnovation] = useState("");
-  const [roadmap, setRoadmap] = useState("");
 
   const handleUpload = async () => {
     if (!file) {
@@ -30,9 +26,13 @@ function Workspace() {
         },
       });
 
-      setSummary(response.data.summary);
-      setInnovation(response.data.innovation);
-      setRoadmap(response.data.roadmap);
+      // Handle the simplified single object payload or string representation
+      if (typeof response.data.analysis === "object") {
+        setSummary(JSON.stringify(response.data.analysis, null, 2));
+      } else {
+        setSummary(response.data.analysis || JSON.stringify(response.data, null, 2));
+      }
+
     } catch (error: any) {
       console.error("FULL ERROR:", error);
       console.log("RESPONSE:", error.response);
@@ -143,39 +143,17 @@ function Workspace() {
           </div>
         )}
 
-        {/* Results */}
+        {/* Unified Results Card */}
 
         {!loading && summary && (
+          <div className="mt-10 bg-white/5 p-8 rounded-3xl border border-cyan-500/20">
+            <h2 className="text-3xl font-bold mb-6">
+              📑 Complete Analysis
+            </h2>
 
-          <div className="grid md:grid-cols-3 gap-6 mt-12">
-
-            <div className="bg-white/5 p-6 rounded-3xl border border-cyan-500/20">
-              <h2 className="text-2xl font-bold mb-4">
-                📄 Summary
-              </h2>
-              <div className="whitespace-pre-wrap text-slate-300">
-                {summary}
-              </div>
+            <div className="whitespace-pre-wrap text-slate-300 font-mono text-sm leading-relaxed">
+              {summary}
             </div>
-
-            <div className="bg-white/5 p-6 rounded-3xl border border-emerald-500/20">
-              <h2 className="text-2xl font-bold mb-4">
-                💡 Innovation
-              </h2>
-              <div className="whitespace-pre-wrap text-slate-300">
-                {innovation}
-              </div>
-            </div>
-
-            <div className="bg-white/5 p-6 rounded-3xl border border-purple-500/20">
-              <h2 className="text-2xl font-bold mb-4">
-                🛠 Roadmap
-              </h2>
-              <div className="whitespace-pre-wrap text-slate-300">
-                {roadmap}
-              </div>
-            </div>
-
           </div>
         )}
 

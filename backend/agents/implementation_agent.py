@@ -1,4 +1,5 @@
 import os
+import time
 from dotenv import load_dotenv
 from google import genai
 
@@ -36,12 +37,21 @@ Phase 3 - Advanced Features
 # Deployment Strategy
 
 Research Paper:
-{text[:30000]}
+{text[:8000]}
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.0-flash",
-        contents=prompt
-    )
+    for attempt in range(3):
+        try:
+            response = client.models.generate_content(
+                model="gemini-2.5-flash",
+                contents=prompt
+            )
+            return response.text
 
-    return response.text
+        except Exception as e:
+            print(f"Roadmap Attempt {attempt + 1} Failed:", e)
+
+            if attempt < 2:
+                time.sleep(10)
+
+    return "Roadmap generation failed."
