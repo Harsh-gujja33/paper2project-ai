@@ -1,10 +1,14 @@
 import { useState } from "react";
 import api from "../services/api";
+import Dashboard from "../components/Dashboard";
 
 function Workspace() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-  const [summary, setSummary] = useState("");
+  const [error, setError] = useState("");
+
+  // Step 1: Clean unified analysis payload state hook variable instance configuration
+  const [analysis, setAnalysis] = useState<any>(null);
 
   const handleUpload = async () => {
     if (!file) {
@@ -17,6 +21,8 @@ function Workspace() {
 
     try {
       setLoading(true);
+      setError("");
+      setAnalysis(null);
 
       console.log("UPLOAD STARTED");
 
@@ -26,51 +32,105 @@ function Workspace() {
         },
       });
 
-      // Handle the simplified single object payload or string representation
-      if (typeof response.data.analysis === "object") {
-        setSummary(JSON.stringify(response.data.analysis, null, 2));
-      } else {
-        setSummary(response.data.analysis || JSON.stringify(response.data, null, 2));
+      const data = response.data;
+
+      if (data.error) {
+        setError(data.error);
+        return;
       }
 
-    } catch (error: any) {
-      console.error("FULL ERROR:", error);
-      console.log("RESPONSE:", error.response);
-      alert("Upload Failed");
+      // Reconstructed state formatting to pull flat fields into grouped properties
+      if (data.summary) {
+        console.log(data);
+
+        setAnalysis({
+          summary: data.summary,
+          innovation: data.innovation,
+          roadmap: data.roadmap,
+        });
+      }
+
+    } catch (err: any) {
+      console.error("FULL ERROR:", err);
+      console.log("RESPONSE:", err.response);
+      setError("Upload Failed. Please check your network connection and try again.");
     } finally {
       setLoading(false);
     }
   };
+
+  // Condition view interceptor rendering the dashboard component if analysis data exists
+  if (analysis) {
+    return <Dashboard analysis={analysis} />;
+  }
 
   return (
     <div className="min-h-screen bg-[#030712] text-white p-8">
 
       <div className="max-w-7xl mx-auto">
 
-        <h1 className="text-5xl font-black text-center mb-4">
-          Paper2Project
-        </h1>
+        {/* Replaced Header Block: Production Grade Hero Header Area */}
+        <div className="text-center mb-16">
 
-        <p className="text-center text-slate-400 mb-12">
-          Upload a research paper and let AI agents analyze it.
-        </p>
+          <div className="inline-block px-4 py-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-sm mb-6">
+            AI Powered Research Analyzer
+          </div>
+
+          <h1
+            className="
+            text-6xl
+            md:text-7xl
+            font-black
+            leading-tight
+            bg-gradient-to-r
+            from-cyan-400
+            via-blue-500
+            to-purple-500
+            bg-clip-text
+            text-transparent
+            mb-6
+          "
+          >
+            Transform Research Papers
+            <br />
+            Into Real Projects
+          </h1>
+
+          <p className="text-xl text-slate-400 max-w-3xl mx-auto">
+            Upload any research paper and instantly generate
+            executive summaries, innovation insights,
+            implementation roadmaps, and production-ready
+            project ideas.
+          </p>
+
+        </div>
 
         {/* Upload Card */}
-
-        <div className="bg-white/5 backdrop-blur-lg border border-cyan-500/20 rounded-3xl p-10">
+        <div
+          className="
+          bg-slate-900/60
+          backdrop-blur-xl
+          border
+          border-cyan-500/20
+          rounded-3xl
+          p-10
+          shadow-[0_0_50px_rgba(6,182,212,0.1)]
+        "
+        >
 
           <div className="border-2 border-dashed border-cyan-500/30 rounded-3xl p-16 text-center">
 
-            <div className="text-6xl mb-6">
-              📄
+            <div className="text-7xl mb-6">
+              📚
             </div>
 
-            <h2 className="text-3xl font-bold mb-4">
+            <h2 className="text-4xl font-bold mb-4">
               Upload Research Paper
             </h2>
 
             <p className="text-slate-400 mb-8">
-              Choose a PDF research paper to analyze.
+              Drag & drop your PDF or browse files.
+              AI agents will generate insights instantly.
             </p>
 
             <input
@@ -129,31 +189,27 @@ function Workspace() {
 
         </div>
 
-        {/* Loading */}
+        {/* Dedicated Inline Error Display Card */}
+        {error && (
+          <div className="mt-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 flex items-center gap-3">
+            <span>❌</span>
+            <div className="text-sm font-medium">{error}</div>
+          </div>
+        )}
 
+        {/* Loading Spinner Area */}
         {loading && (
           <div className="text-center mt-12">
 
             <div className="w-16 h-16 border-4 border-cyan-500 border-t-transparent rounded-full animate-spin mx-auto" />
 
-            <p className="mt-6 text-slate-300">
-              AI Agents are analyzing your paper...
-            </p>
-
-          </div>
-        )}
-
-        {/* Unified Results Card */}
-
-        {!loading && summary && (
-          <div className="mt-10 bg-white/5 p-8 rounded-3xl border border-cyan-500/20">
-            <h2 className="text-3xl font-bold mb-6">
-              📑 Complete Analysis
-            </h2>
-
-            <div className="whitespace-pre-wrap text-slate-300 font-mono text-sm leading-relaxed">
-              {summary}
+            <div className="mt-8 space-y-3 text-slate-300">
+              <p>✅ PDF Uploaded</p>
+              <p>✅ Extracting Text</p>
+              <p>✅ Understanding Research</p>
+              <p>⏳ Generating Insights</p>
             </div>
+
           </div>
         )}
 

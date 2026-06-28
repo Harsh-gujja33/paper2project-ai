@@ -51,10 +51,16 @@ async def upload_pdf(file: UploadFile = File(...)):
         print("Analysis Generated Successfully")
 
     except Exception as e:
-        analysis = f"Error: {str(e)}"
         print("ANALYSIS FAILED:", e)
+        # Directly interrupt processing and return a clean error object
+        return {
+            "error": str(e)
+        }
 
+    # Matches the exact flat root-key layout requested by your React state engine
     return {
         "filename": file.filename,
-        "analysis": analysis
+        "summary": analysis.get("summary", {}),
+        "innovation": analysis.get("innovation", {}),
+        "roadmap": analysis.get("roadmap", {})
     }
